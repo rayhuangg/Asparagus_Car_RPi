@@ -19,12 +19,13 @@ PWMfun=GPIO.PWM(12,600)
 PWMfun2=GPIO.PWM(13,600)
 
 
-def send_motor_pwm(direction,section_r):
-    pwm = {'direction':direction,'section_r':section_r}
+# 原本send_motor_pwm，被搞死..
+def send_message_to_rpi_right(direction,section_r):
+    pwm = {'direction':direction, 'section_r':section_r}
     ser = serial.Serial(
-    port='/dev/ttyAMA1', #Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
-    baudrate = 115200,
-    timeout=0.3
+        port='/dev/ttyAMA1', #Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
+        baudrate = 115200,
+        timeout=0.3
 	)
 #     ser.write(str.encode(f'{counter}\n'))s
     ser.write(bytes(str(pwm),'utf-8'))
@@ -60,15 +61,28 @@ class Asparagus_car:
         PWMfun.start(self.speed)
         PWMfun2.start(self.speed)
         print("Car ready")
+
     def __capture(self,location='error_p'):
-        now = datetime.now().strftime('%Y%m%d_%H_%M_%S_')
-        filename = location
-        action_left='libcamera-still -n -t 1 -o /home/pi/Desktop/new_control_0901/left/'+now + '.jpg --width 1920 --height 1080'
-        #action_left = 'raspistill -w 1920 -h 1080 -o /home/pi/Desktop/new_control_0901/left/'+now + '.jpg'
+        now = datetime.now().strftime('%Y%m%d_%H_%M_%S')
+
+        folder = "/home/pi/Desktop/photo_record/left/"
+        if not os.path.isdir(folder):
+            os.makedirs(mode=0o777)
+
+        filename = f"{now}-{location}.jpg"
+        action_left = f'libcamera-still -n -t 1 -o {folder}/{filename} --width 1920 --height 1080'
+        # action_left = f'libcamera-still -n -t 1 -o {folder}/{filename}'
+
+        # Old
+        # action_right='libcamera-still -n -t 1 -o /home/pi/Desktop/photo_record/left/'+now + '.jpg --width 1920 --height 1080'
+        # action_right='libcamera-still -n -t 1 -o /home/pi/Desktop/photo_record/right/'+now + '.jpg'
+
         os.system(action_left)
-        up.side(section = location , imagepath = '/home/pi/Desktop/new_control_0901/left/'+now + '.jpg')
+        #print(location)
+        up.side(section = location , imagepath = f'{folder}/{filename}')
         time.sleep(1.2)
         print('saved')
+
     def __slow_down(self):
         if self.status=="b" or self.status=="f" :
             while(self.speed>0):
@@ -156,6 +170,8 @@ class Asparagus_car:
                 self.speed=self.speed+2
                 PWMfun.ChangeDutyCycle(self.speed)
                 PWMfun2.ChangeDutyCycle(self.speed)
+
+
     def drive(self,direction="s",top_speed = 10,speed_l=5,speed_r=5,section_r='E36',section_l='error_p'):
         # print(direction)
         if direction!=self.status:
@@ -201,7 +217,7 @@ def job():
             speed_top = (speed_left + speed_right) / 2
             section_r = singnal_dict['section_r']
             section_l = singnal_dict['section_l']
-            send_motor_pwm(data_messsage,str(section_r))
+            send_message_to_rpi_right(data_messsage,str(section_r))
            #print('message',data_messsage)
             if 'left' in singnal_dict['direction']:
                 data="l"
