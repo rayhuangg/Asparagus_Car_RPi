@@ -132,7 +132,6 @@ class Asparagus_car:
                 PWM_output_left.ChangeDutyCycle(self.speed)
                 PWM_output_right.ChangeDutyCycle(self.speed)
 
-
     def drive(self, direction="s", top_speed=10, speed_l=5, speed_r=5, section_r='E36', section_l='error_p'):
         if direction != self.status:
             self.__change_direct(direction, section_r, section_l)
@@ -161,7 +160,6 @@ def receive_motot_pwm():
     ser.close()
     return singnal
 
-
 # 原本是send_motor_pwm，被搞死..
 def send_message_to_rpi_right(direction, section_r):
     pwm = {'direction': direction, 'section_r': section_r}
@@ -171,7 +169,6 @@ def send_message_to_rpi_right(direction, section_r):
     time.sleep(0.1)
     print(pwm)
     ser.close()
-
 
 def job():
     global data, speed_left, speed_right, speed_top, section_r, section_l
