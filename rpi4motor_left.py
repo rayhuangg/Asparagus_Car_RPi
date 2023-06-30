@@ -63,14 +63,14 @@ class Asparagus_car:
         print('saved')
 
     def __slow_down(self):
-        if self.status == "b" or self.status == "f":
+        if self.status == "b" or self.status == "f" or self.status == "s":  # bf不確定原因
             while self.speed > 0:
                 self.speed = self.speed - 3
                 if self.speed < 0:
                     break
                 PWM_output_left.ChangeDutyCycle(self.speed)
                 PWM_output_right.ChangeDutyCycle(self.speed)
-                time.sleep(0.1)
+                time.sleep(0.15)
         self.speed = 0
         PWM_output_left.ChangeDutyCycle(self.speed)
         PWM_output_right.ChangeDutyCycle(self.speed)
@@ -150,7 +150,7 @@ class Asparagus_car:
         PWM_output_right.stop()
         GPIO.cleanup()
 
-def receive_motot_pwm():
+def receive_motor_pwm():
     ser = serial.Serial(port='/dev/ttyS0', baudrate=115200, timeout=0.1)
     try:
         singnal = ser.readline()
@@ -173,7 +173,7 @@ def send_message_to_rpi_right(direction, section_r):
 def job():
     global data, speed_left, speed_right, speed_top, section_r, section_l
     while connect_status == 1:
-        singnal = receive_motot_pwm().decode(errors='ignore')
+        singnal = receive_motor_pwm().decode(errors='ignore')
         try:
             singnal_dict = ast.literal_eval(singnal)
             print(singnal_dict)
@@ -200,33 +200,37 @@ def job():
     GPIO.cleanup()
 
 
-count = 0
-time.sleep(5)
-mycar = Asparagus_car()
-data = "s"
-speed_left = 0
-speed_right = 0
-speed_top = 0
-section_r = 'error_p'
-section_l = 'error_p'
-connect_status = 1
-try:
-    t = threading.Thread(target=job)
-    t.start()
-    while True:
-        pr_data = data
-        mycar.drive(
-            pr_data,
-            top_speed=speed_top,
-            speed_l=speed_left,
-            speed_r=speed_right,
-            section_r=section_r,
-            section_l=section_l,
-        )
+def main():
+    count = 0
+    time.sleep(5)
+    mycar = Asparagus_car()
+    data = "s"
+    speed_left = 0
+    speed_right = 0
+    speed_top = 0
+    section_r = 'error_p'
+    section_l = 'error_p'
+    connect_status = 1
+    try:
+        t = threading.Thread(target=job)
+        t.start()
+        while True:
+            pr_data = data
+            mycar.drive(
+                pr_data,
+                top_speed=speed_top,
+                speed_l=speed_left,
+                speed_r=speed_right,
+                section_r=section_r,
+                section_l=section_l,
+            )
         # send_motor_pwm(pr_data,speed_right,speed_left,str(section_r))
-        time.sleep(0.1)
-        count += count
+            time.sleep(0.1)
+            count += count
 
-finally:
-    mycar.parking()
-    GPIO.cleanup()
+    finally:
+        mycar.parking()
+        GPIO.cleanup()
+
+if __name__ == "__main__":
+    main
