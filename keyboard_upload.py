@@ -56,8 +56,10 @@ if __name__ == "__main__":
     while True:
         print("Waiting to press... Press p to take photo and upload.")
         key = getkey()
-        # 获取计算机的主机名
         hostname = socket.gethostname()
         if key == 'p':
             print("Receive key 'p'")
-            capture(location="B1")
+            if hostname == "raspberrypi-1dinci":
+                capture(location="B1")
+            elif hostname == "raspberrypi-2dinci":
+                capture(location="A1")

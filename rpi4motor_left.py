@@ -25,12 +25,12 @@ class Asparagus_car:
         self.Pin2 = 5
         self.Pin3 = 19
         self.Pin4 = 16
-        self.PWMPin_left  = 12
+        self.PWMPin_left = 12
         self.PWMPin_right = 13
 
         # Initial the status
         self.speed = 0
-        self.status  = "s"  # Forward, Stop, Backword
+        self.status = "s"  # Forward, Stop, Backword
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.Pin1, GPIO.OUT)
@@ -132,7 +132,15 @@ class Asparagus_car:
                 PWM_output_left.ChangeDutyCycle(self.speed)
                 PWM_output_right.ChangeDutyCycle(self.speed)
 
-    def drive(self, direction="s", top_speed=10, speed_l=5, speed_r=5, section_r='E36', section_l='error_p'):
+    def drive(
+        self,
+        direction="s",
+        top_speed=10,
+        speed_l=5,
+        speed_r=5,
+        section_r='E36',
+        section_l='error_p',
+    ):
         if direction != self.status:
             self.__change_direct(direction, section_r, section_l)
         else:
@@ -150,6 +158,7 @@ class Asparagus_car:
         PWM_output_right.stop()
         GPIO.cleanup()
 
+
 def receive_motor_pwm():
     ser = serial.Serial(port='/dev/ttyS0', baudrate=115200, timeout=0.1)
     try:
@@ -160,14 +169,20 @@ def receive_motor_pwm():
     ser.close()
     return singnal
 
+
 # 原本是send_motor_pwm，被搞死..
 def send_message_to_rpi_right(direction, section_r):
     pwm = {'direction': direction, 'section_r': section_r}
-    ser = serial.Serial(port='/dev/ttyAMA1', baudrate=115200, timeout=0.3,)
+    ser = serial.Serial(
+        port='/dev/ttyAMA1',
+        baudrate=115200,
+        timeout=0.3,
+    )
     ser.write(bytes(str(pwm), 'utf-8'))
     ser.flush()
     time.sleep(0.1)
     ser.close()
+
 
 def job():
     global data, speed_left, speed_right, speed_top, section_r, section_l
@@ -236,6 +251,7 @@ def main():
         print("Press ctrl+c one more time to kill this scrip")
         # mycar.parking()
         GPIO.cleanup()
+
 
 if __name__ == "__main__":
     main()
