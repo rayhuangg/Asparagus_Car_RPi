@@ -54,11 +54,11 @@ class Asparagus_car:
             os.makedirs(path, mode=0o777)
 
         filename = f"{now}-{location}.jpg"
-        action_left = f'libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080'  # 1920x1080
-        # action_left = f'libcamera-still -n -t 1 -o {folder}/{filename}'  # 3280x2464
+        # action_left = f'libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080'  # 1920x1080
+        action_left = f'libcamera-still -n -t 1 -o {path}/{filename}'  # 3280x2464
         os.system(action_left)
 
-        up.side(section=location, imagepath=f'{path}/{filename}')
+        # up.side(section=location, imagepath=f'{path}/{filename}')
         time.sleep(1.2)
         print('saved')
 
@@ -70,7 +70,7 @@ class Asparagus_car:
                     break
                 PWM_output_left.ChangeDutyCycle(self.speed)
                 PWM_output_right.ChangeDutyCycle(self.speed)
-                time.sleep(0.15)
+                time.sleep(0.05)
         self.speed = 0
         PWM_output_left.ChangeDutyCycle(self.speed)
         PWM_output_right.ChangeDutyCycle(self.speed)
@@ -167,7 +167,6 @@ def send_message_to_rpi_right(direction, section_r):
     ser.write(bytes(str(pwm), 'utf-8'))
     ser.flush()
     time.sleep(0.1)
-    print(pwm)
     ser.close()
 
 def job():
@@ -176,7 +175,7 @@ def job():
         singnal = receive_motor_pwm().decode(errors='ignore')
         try:
             singnal_dict = ast.literal_eval(singnal)
-            print(singnal_dict)
+            print(f"Received: {singnal_dict}")
             data_messsage = singnal_dict['direction']
             speed_left = round(singnal_dict['left'], 2)
             speed_right = round(singnal_dict['right'], 2)
@@ -201,9 +200,11 @@ def job():
 
 
 def main():
+    global connect_status
+    global data, speed_left, speed_right, speed_top, section_r, section_l
     count = 0
-    time.sleep(5)
     mycar = Asparagus_car()
+    time.sleep(2)
     data = "s"
     speed_left = 0
     speed_right = 0
@@ -224,13 +225,17 @@ def main():
                 section_r=section_r,
                 section_l=section_l,
             )
-        # send_motor_pwm(pr_data,speed_right,speed_left,str(section_r))
             time.sleep(0.1)
             count += count
 
+    except KeyboardInterrupt:
+        print("Program stopping...")
+
     finally:
-        mycar.parking()
+        print("GPIO cleaning...")
+        print("Press ctrl+c one more time to kill this scrip")
+        # mycar.parking()
         GPIO.cleanup()
 
 if __name__ == "__main__":
-    main
+    main()

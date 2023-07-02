@@ -1,14 +1,12 @@
 import time
-import RPi.GPIO as GPIO
-import os
-import io
 from datetime import datetime
-import serial
-import ast
-import threading
+
 import imageUpload as up
+import RPi.GPIO as GPIO
+import serial
 from getkey import getkey, keys
 from rpi4motor_left import Asparagus_car
+
 
 def send_message_to_rpi_right(direction, section_r="dont take"):
     pwm = {'direction': direction, 'section_r': section_r}
@@ -17,11 +15,9 @@ def send_message_to_rpi_right(direction, section_r="dont take"):
         baudrate=115200,
         timeout=0.3,
     )
-    #     ser.write(str.encode(f'{counter}\n'))s
     ser.write(bytes(str(pwm), 'utf-8'))
     ser.flush()
     time.sleep(0.1)
-    print(pwm)
     ser.close()
 
 
@@ -37,7 +33,7 @@ def main():
             # 要加速就多按幾下，會越來越快
             if key == keys.UP:
                 print('forward')
-                mycar.drive(direction="f", top_speed=20, speed_l=10, speed_r=10)
+                mycar.drive(direction="f", top_speed=30, speed_l=15, speed_r=15)
 
             elif key == keys.DOWN:
                 print('slow down')
@@ -45,17 +41,18 @@ def main():
 
             elif key == keys.LEFT:
                 print('turn left')
-                mycar.drive(direction="l", speed_l=3, speed_r=10)
+                mycar.drive(direction="l", speed_l=1, speed_r=15)
 
             elif key == keys.RIGHT:
                 print('turn right')
-                mycar.drive(direction="r", speed_l=10, speed_r=3)
+                mycar.drive(direction="r", speed_l=15, speed_r=1)
 
     except KeyboardInterrupt:
         print("\nStop the program...")
 
     finally:
         print("GPIO cleaning...")
+        mycar.parking()
         GPIO.cleanup()
 
 if __name__ == "__main__":
