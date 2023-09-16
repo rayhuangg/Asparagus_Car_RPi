@@ -1,12 +1,11 @@
 import time
 from datetime import datetime
+import serial
+import RPi.GPIO as GPIO
+from getkey import getkey, keys
 
 import imageUpload as up
-import RPi.GPIO as GPIO
-import serial
-from getkey import getkey, keys
-from rpi4motor_left import Asparagus_car
-
+from asparagus_car import AsparagusCar
 
 def send_message_to_rpi_right(direction, section_r="dont take"):
     pwm = {'direction': direction, 'section_r': section_r}
@@ -22,7 +21,7 @@ def send_message_to_rpi_right(direction, section_r="dont take"):
 
 
 def main():
-    mycar = Asparagus_car()
+    mycar = AsparagusCar()
     print("Press up to speed up.")
     print("Press down to stop")
     print("Press right to turn right")

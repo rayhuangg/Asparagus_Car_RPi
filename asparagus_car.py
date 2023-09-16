@@ -1,3 +1,11 @@
+# raspberrypi_1(left):
+# responsible for controlling the motors on both sides
+# and capturing images on the left side.
+
+# raspberrypi_2(right):
+# only responsible for capturing images on the right side.
+
+
 import os
 import socket
 import time
@@ -55,8 +63,8 @@ class AsparagusCar:
             os.makedirs(path, mode=0o777)
 
         filename = f"{now}-{location}.jpg"
-        action = f'libcamera-still -n -t 1 -o {path}/{filename}'  # 3280x2464
-        # action = f'libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080'  # 1920x1080
+        # action = f'libcamera-still -n -t 1 -o {path}/{filename}'  # 3280x2464
+        action = f'libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080'  # 1920x1080
         os.system(action)
 
         up.side(section=location, imagepath=f'{path}/{filename}')
@@ -118,11 +126,11 @@ class AsparagusCar:
 
         # p means "Photo"
         elif direction == "p":
-            GPIO.output(self.Pin1, GPIO.LOW)
-            GPIO.output(self.Pin2, GPIO.LOW)
-            GPIO.output(self.Pin3, GPIO.LOW)
-            GPIO.output(self.Pin4, GPIO.LOW)
             if self.hostname == "raspberrypi-1dinci":
+                GPIO.output(self.Pin1, GPIO.LOW)
+                GPIO.output(self.Pin2, GPIO.LOW)
+                GPIO.output(self.Pin3, GPIO.LOW)
+                GPIO.output(self.Pin4, GPIO.LOW)
                 self.__capture(location=section_l)
             elif self.hostname == "raspberrypi-2dinci":
                 self.__capture(location=section_r)
@@ -152,13 +160,17 @@ class AsparagusCar:
                 self.__speed_up(direction, top_speed, speed_l, speed_r)
 
     def parking(self):
-        self.__slow_down()
-        self.status = "s"
-        GPIO.output(self.Pin1, GPIO.LOW)
-        GPIO.output(self.Pin2, GPIO.LOW)
-        GPIO.output(self.Pin3, GPIO.LOW)
-        GPIO.output(self.Pin4, GPIO.LOW)
-        self.PWM_output_left.stop()
-        self.PWM_output_right.stop()
-        GPIO.cleanup()
+        if self.hostname == "raspberrypi-1dinci":
+            self.__slow_down()
+            self.status = "s"
+            GPIO.output(self.Pin1, GPIO.LOW)
+            GPIO.output(self.Pin2, GPIO.LOW)
+            GPIO.output(self.Pin3, GPIO.LOW)
+            GPIO.output(self.Pin4, GPIO.LOW)
+            self.PWM_output_left.stop()
+            self.PWM_output_right.stop()
+            GPIO.cleanup()
+
+        elif self.hostname == "raspberrypi-1dinci":
+            pass
 

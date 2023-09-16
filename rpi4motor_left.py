@@ -51,7 +51,6 @@ def job():
             speed_top = (speed_left + speed_right) / 2
             section_r = signal_dict['section_r']
             section_l = signal_dict['section_l']
-            send_message_to_rpi_right(direction, str(section_r))
 
             if 'left' in direction:
                 data = "l"
@@ -63,6 +62,8 @@ def job():
                 data = "f"
             else:
                 data = "s"
+            time.sleep(0.1)
+            send_message_to_rpi_right(direction, str(section_r))
 
         # Prevent "unexpected EOF while parsing (<unknown>, line 0)" error
         except SyntaxError:
