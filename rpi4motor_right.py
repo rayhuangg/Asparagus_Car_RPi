@@ -83,7 +83,7 @@ def main():
 
     finally:
         print("GPIO cleaning...")
-        # mycar.parking()
+        mycar.parking()
 
 
 if __name__ == "__main__":

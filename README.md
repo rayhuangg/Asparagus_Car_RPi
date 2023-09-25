@@ -13,7 +13,7 @@ rpi4motor_right.py               // right rpi主程式
 
 # 使用方法
 ## Rpi1_left
-Fullname: raspberrypi-1dinci
+Fullname: RPiCar1Left
 
 用途: 連接兩邊馬達驅動器，接收從AGX下達的馬達控制指令，並負責左邊pi camera拍照上傳
 
@@ -35,7 +35,7 @@ python3 keyboard_upload.py
 
 
 ## Rpi2_right
-Fullname: raspberrypi-2dinci
+Fullname: RPiCar1Right
 
 用途: 僅負責右邊pi camera拍照上傳
 

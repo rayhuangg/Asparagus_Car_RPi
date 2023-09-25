@@ -17,7 +17,7 @@ from datetime import datetime
 class AsparagusCar:
     def __init__(self):
         self.hostname = socket.gethostname()
-        if self.hostname == "raspberrypi-1dinci":
+        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
             # Define the pin number
             self.Pin1 = 6
             self.Pin2 = 5
@@ -47,16 +47,16 @@ class AsparagusCar:
             self.PWM_output_left.start(self.speed)
             self.PWM_output_right.start(self.speed)
 
-        elif self.hostname == "raspberrypi-2dinci":
+        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
             self.status = "s"
         print("Car ready")
 
 
     def capture(self, section="unspecified"):
         now = datetime.now().strftime('%Y%m%d_%H_%M_%S')
-        if self.hostname == "raspberrypi-1dinci":
+        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
             path = "/home/pi/Desktop/photo_record/left/"
-        elif self.hostname == "raspberrypi-2dinci":
+        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
             path = "/home/pi/Desktop/photo_record/right/"
 
         if not os.path.isdir(path):
@@ -131,13 +131,13 @@ class AsparagusCar:
 
         # p means "Photo"
         elif direction == "p":
-            if self.hostname == "raspberrypi-1dinci":
+            if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
                 GPIO.output(self.Pin1, GPIO.LOW)
                 GPIO.output(self.Pin2, GPIO.LOW)
                 GPIO.output(self.Pin3, GPIO.LOW)
                 GPIO.output(self.Pin4, GPIO.LOW)
                 self.capture(section=section_l)
-            elif self.hostname == "raspberrypi-2dinci":
+            elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
                 self.capture(section=section_r)
             self.status = "s"
 
@@ -165,7 +165,7 @@ class AsparagusCar:
                 self.__speed_up(direction, top_speed, speed_l, speed_r)
 
     def parking(self):
-        if self.hostname == "raspberrypi-1dinci":
+        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
             self.__slow_down()
             self.status = "s"
             GPIO.output(self.Pin1, GPIO.LOW)
@@ -176,6 +176,6 @@ class AsparagusCar:
             self.PWM_output_right.stop()
             GPIO.cleanup()
 
-        elif self.hostname == "raspberrypi-1dinci":
+        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
             pass
 
