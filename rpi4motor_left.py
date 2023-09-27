@@ -10,7 +10,7 @@ import imageUpload as up
 from datetime import datetime
 from asparagus_car import AsparagusCar
 
-connect_status = 0
+connect_status = False
 
 def receive_motor_pwm():
     ser = serial.Serial(port="/dev/ttyS0", baudrate=115200, timeout=0.1)
@@ -23,10 +23,9 @@ def receive_motor_pwm():
     return signal
 
 
-# 原本是send_motor_pwm，被搞死..
-def send_message_to_rpi_right(direction, section_r):
-    pwm = {"direction": direction, "section_r": section_r}
-    print("send message:" ,pwm)
+def send_message_to_rpi_right(status, section_r, detection=False):
+    pwm = {"status": status, "section_r": section_r, "detection":detection}
+    print("send message:", pwm)
     ser = serial.Serial(
         port="/dev/ttyAMA1",
         baudrate=115200,
@@ -39,31 +38,36 @@ def send_message_to_rpi_right(direction, section_r):
 
 
 def job():
-    global data, speed_left, speed_right, speed_top, section_r, section_l
-    while connect_status == 1:
+    global data, speed_left, speed_right, speed_top, section_r, section_l, detection
+    while connect_status:
         signal = receive_motor_pwm().decode(errors="ignore")
         try:
             signal_dict = ast.literal_eval(signal)
             print(f"Received: {signal_dict}")
-            direction = signal_dict["direction"]
+            status = signal_dict["status"]
             speed_left = round(signal_dict["left"], 2)
             speed_right = round(signal_dict["right"], 2)
             speed_top = (speed_left + speed_right) / 2
             section_r = signal_dict["section_r"]
             section_l = signal_dict["section_l"]
+            detection = signal_dict["detection"]
 
-            if "left" in direction:
+            # "data" means the status that the car should do
+            # (but I think should be change to use the raw receive data)
+            if "left" in status:
                 data = "l"
-            elif "right" in direction:
+            elif "right" in status:
                 data = "r"
-            elif "photo" in direction:
-                data = "p"
-            elif "mid" in direction:
+            elif "photo" in status:
+                # "p" means take photo
+                # "p+d" means take photo and to the detection immediately
+                data = "p+d" if detection==True else "p"
+            elif "mid" in status:
                 data = "f"
             else:
                 data = "s"
             time.sleep(0.1)
-            send_message_to_rpi_right(direction, str(section_r))
+            send_message_to_rpi_right(status, str(section_r), detection=detection)
 
         # Prevent "unexpected EOF while parsing (<unknown>, line 0)" error
         except SyntaxError:
@@ -85,7 +89,7 @@ def main():
     speed_top = 0
     section_r = "unspecified"
     section_l = "unspecified"
-    connect_status = 1
+    connect_status = True
     try:
         t = threading.Thread(target=job)
         t.start()

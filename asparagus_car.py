@@ -1,10 +1,9 @@
-# raspberrypi_1(left):
+# RPiCar1(2)Left:
 # responsible for controlling the motors on both sides
 # and capturing images on the left side.
 
-# raspberrypi_2(right):
+# RPiCar1(2)Right:
 # only responsible for capturing images on the right side.
-
 
 import os
 import socket
@@ -17,7 +16,7 @@ from datetime import datetime
 class AsparagusCar:
     def __init__(self):
         self.hostname = socket.gethostname()
-        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
+        if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
             # Define the pin number
             self.Pin1 = 6
             self.Pin2 = 5
@@ -49,14 +48,19 @@ class AsparagusCar:
 
         elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
             self.status = "s"
+
         print("Car ready")
 
 
-    def capture(self, section="unspecified"):
+    def capture(self, section="unspecified", detection=False):
+        """
+        Actually "unspecified" is not exist on the web section model
+        only "test" exist
+        """
         now = datetime.now().strftime("%Y%m%d_%H_%M_%S")
-        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
+        if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
             path = "/home/pi/Desktop/photo_record/left/"
-        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
+        elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
             path = "/home/pi/Desktop/photo_record/right/"
 
         if not os.path.isdir(path):
@@ -67,12 +71,10 @@ class AsparagusCar:
         action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
         os.system(action)
 
-        # "unspecified" is not exist on web section model
-        # only "test" exist
         if section == "unspecified":
             section = "test"
 
-        up.side(section=section, imagepath=f"{path}/{filename}", name=filename)
+        up.side(section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
         time.sleep(1.2)
         print("photo saved and upload successed")
 
@@ -107,7 +109,7 @@ class AsparagusCar:
             GPIO.output(self.Pin3, GPIO.HIGH)
             GPIO.output(self.Pin4, GPIO.LOW)
 
-        # 不知道是什麼
+        # b means "back"
         elif direction == "b":
             self.__slow_down()
             GPIO.output(self.Pin1, GPIO.LOW)
@@ -129,16 +131,18 @@ class AsparagusCar:
             GPIO.output(self.Pin3, GPIO.HIGH)
             GPIO.output(self.Pin4, GPIO.LOW)
 
-        # p means "Photo"
-        elif direction == "p":
-            if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
+        # p means "Photo", p+d means "Photo & detection"
+        elif direction == "p" or direction == "p+d":
+            if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
                 GPIO.output(self.Pin1, GPIO.LOW)
                 GPIO.output(self.Pin2, GPIO.LOW)
                 GPIO.output(self.Pin3, GPIO.LOW)
                 GPIO.output(self.Pin4, GPIO.LOW)
-                self.capture(section=section_l)
-            elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
-                self.capture(section=section_r)
+                self.capture(section=section_l, detection=(direction == "p+d"))
+
+            elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
+                self.capture(section=section_r, detection=(direction == "p+d"))
+
             self.status = "s"
 
     def __speed_up(self, direction, top_speed, speed_l, speed_r):
@@ -165,7 +169,7 @@ class AsparagusCar:
                 self.__speed_up(direction, top_speed, speed_l, speed_r)
 
     def parking(self):
-        if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
+        if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
             self.__slow_down()
             self.status = "s"
             GPIO.output(self.Pin1, GPIO.LOW)
@@ -176,6 +180,6 @@ class AsparagusCar:
             self.PWM_output_right.stop()
             GPIO.cleanup()
 
-        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
+        elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
             pass
 

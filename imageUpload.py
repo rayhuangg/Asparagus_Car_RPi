@@ -24,12 +24,14 @@ def front(imagepath, name="foo", date="bar"):
 
     if r.status_code == 200:
         print("Successully uploaded!")
+        print(f"Responce time {r.elapsed.total_seconds()} s.")
     else:
-        print("Error uploading...")
+        print(f"Error uploading... status code: {r.status_code}")
 
     image.close()
 
-def side(section, imagepath, name="foo", date="bar"):
+
+def side(section, imagepath, name="foo", date="bar", detection=False):
     """
     Args:
         url: fixed, corresponding to database storage.
@@ -41,6 +43,7 @@ def side(section, imagepath, name="foo", date="bar"):
                 ...
                 F1~F8 = 41~48
         image: Bytes, buffer the image for upload
+        detection (bool): determine whether immediate identification is required
 
     Examples:
     >> from imageUpload import side
@@ -51,14 +54,20 @@ def side(section, imagepath, name="foo", date="bar"):
     url = "http://140.112.183.138:3000/record/side/"
     image = open(imagepath, "rb")
 
-    if name != "foo" and date != "bar":
-        r = requests.post(url, data={"name": name, "date": date, "section": section}, files={"image": image})
-    else:
-        r = requests.post(url, data={"section": section}, files={"image": image})
+
+    data = {"section": section}
+    if name != "foo":
+        data["name"] = name
+    if detection:
+        data["detection"] = detection
+
+    r = requests.post(url, data=data, files={"image": image})
+
 
     if r.status_code == 200:
         print("Successully uploaded!")
+        print(f"Responce time {r.elapsed.total_seconds()} s.")
     else:
-        print("Error uploading...")
+        print(f"Error uploading... status code: {r.status_code}")
 
     image.close()

@@ -1,3 +1,5 @@
+# Only can run in the left RPi, cause the motor is driven by left side RPi
+
 import time
 from datetime import datetime
 import serial
@@ -7,8 +9,8 @@ from getkey import getkey, keys
 import imageUpload as up
 from asparagus_car import AsparagusCar
 
-def send_message_to_rpi_right(direction, section_r="dont take"):
-    pwm = {"direction": direction, "section_r": section_r}
+def send_message_to_rpi_right(status, section_r="unspecified"):
+    pwm = {"status": status, "section_r": section_r}
     ser = serial.Serial(
         port="/dev/ttyAMA1",  # Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
         baudrate=115200,

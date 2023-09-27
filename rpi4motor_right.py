@@ -10,7 +10,7 @@ import imageUpload as up
 from datetime import datetime
 from asparagus_car import AsparagusCar
 
-connect_status = 0
+connect_status = False
 
 def receive_rpi_signal():
     ser = serial.Serial(port="/dev/ttyAMA1", baudrate=115200, timeout=0.3)
@@ -24,18 +24,19 @@ def receive_rpi_signal():
 
 
 def job():
-    global data, speed_left, speed_right, speed_top, section_r, section_l
-    while connect_status == 1:
+    global data, speed_left, speed_right, speed_top, section_r, section_l, detection
+    while connect_status:
         signal = receive_rpi_signal().decode(errors="ignore")
         try:
             signal_dict = ast.literal_eval(signal)
             print(f"Received: {signal_dict}")
-            data_messsage = signal_dict["direction"]
+            status = signal_dict["status"]
             section_r = signal_dict["section_r"]
 
-            if "photo" in data_messsage:
-                print("receive photo signal")
-                data = "p"
+            if "photo" in status:
+                # "p" means take photo
+                # "p+d" means take photo and to the detection immediately
+                data = "p+d" if detection==True else "p"
             else:
                 data = "s"
 
@@ -45,7 +46,6 @@ def job():
 
         except Exception as e:
             print("Exception:", e)
-            pass
 
 
 def main():
@@ -59,7 +59,7 @@ def main():
     speed_top = 0
     section_r = "unspecified"
     section_l = "unspecified"
-    connect_status = 1
+    connect_status = True
     try:
         t = threading.Thread(target=job)
         t.start()
