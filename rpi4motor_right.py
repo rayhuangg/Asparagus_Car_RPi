@@ -13,7 +13,7 @@ from asparagus_car import AsparagusCar
 connect_status = 0
 
 def receive_rpi_signal():
-    ser = serial.Serial(port='/dev/ttyAMA1', baudrate=115200, timeout=0.3)
+    ser = serial.Serial(port="/dev/ttyAMA1", baudrate=115200, timeout=0.3)
     try:
         signal = ser.readline()
         ser.flush()
@@ -26,14 +26,14 @@ def receive_rpi_signal():
 def job():
     global data, speed_left, speed_right, speed_top, section_r, section_l
     while connect_status == 1:
-        signal = receive_rpi_signal().decode(errors='ignore')
+        signal = receive_rpi_signal().decode(errors="ignore")
         try:
             signal_dict = ast.literal_eval(signal)
             print(f"Received: {signal_dict}")
-            data_messsage = signal_dict['direction']
-            section_r = signal_dict['section_r']
+            data_messsage = signal_dict["direction"]
+            section_r = signal_dict["section_r"]
 
-            if 'photo' in data_messsage:
+            if "photo" in data_messsage:
                 print("receive photo signal")
                 data = "p"
             else:
@@ -57,8 +57,8 @@ def main():
     speed_left = 0
     speed_right = 0
     speed_top = 0
-    section_r = 'unspecified'
-    section_l = 'unspecified'
+    section_r = "unspecified"
+    section_l = "unspecified"
     connect_status = 1
     try:
         t = threading.Thread(target=job)

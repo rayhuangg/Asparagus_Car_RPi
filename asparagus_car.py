@@ -53,7 +53,7 @@ class AsparagusCar:
 
 
     def capture(self, section="unspecified"):
-        now = datetime.now().strftime('%Y%m%d_%H_%M_%S')
+        now = datetime.now().strftime("%Y%m%d_%H_%M_%S")
         if self.hostname == "RPiCar1Left" or self.hostname == "RPiCar2Left":
             path = "/home/pi/Desktop/photo_record/left/"
         elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
@@ -63,8 +63,8 @@ class AsparagusCar:
             os.makedirs(path, mode=0o777)
 
         filename = f"{now}-{section}.jpg"
-        # action = f'libcamera-still -n -t 1 -o {path}/{filename}' # 3280x2464
-        action = f'libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080' # 1920x1080
+        # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
+        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
         os.system(action)
 
         # "unspecified" is not exist on web section model
@@ -72,9 +72,9 @@ class AsparagusCar:
         if section == "unspecified":
             section = "test"
 
-        up.side(section=section, imagepath=f'{path}/{filename}', name=filename)
+        up.side(section=section, imagepath=f"{path}/{filename}", name=filename)
         time.sleep(1.2)
-        print('photo saved and upload successed')
+        print("photo saved and upload successed")
 
     def __slow_down(self):
         if self.status == "b" or self.status == "f" or self.status == "s":  # bf不確定原因
@@ -89,7 +89,7 @@ class AsparagusCar:
         self.PWM_output_left.ChangeDutyCycle(self.speed)
         self.PWM_output_right.ChangeDutyCycle(self.speed)
 
-    def __change_direct(self, direction="s", section_r='unspecified', section_l='unspecified'):
+    def __change_direct(self, direction="s", section_r="unspecified", section_l="unspecified"):
         self.status = direction
         # s means "stop"
         if direction == "s":
@@ -157,7 +157,7 @@ class AsparagusCar:
                 self.PWM_output_left.ChangeDutyCycle(self.speed)
                 self.PWM_output_right.ChangeDutyCycle(self.speed)
 
-    def drive(self, direction="s", top_speed=10, speed_l=5, speed_r=5, section_r='unspecified', section_l='unspecified'):
+    def drive(self, direction="s", top_speed=10, speed_l=5, speed_r=5, section_r="unspecified", section_l="unspecified"):
         if direction != self.status:
             self.__change_direct(direction, section_r, section_l)
         else:

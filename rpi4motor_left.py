@@ -13,7 +13,7 @@ from asparagus_car import AsparagusCar
 connect_status = 0
 
 def receive_motor_pwm():
-    ser = serial.Serial(port='/dev/ttyS0', baudrate=115200, timeout=0.1)
+    ser = serial.Serial(port="/dev/ttyS0", baudrate=115200, timeout=0.1)
     try:
         signal = ser.readline()
         ser.flush()
@@ -25,14 +25,14 @@ def receive_motor_pwm():
 
 # 原本是send_motor_pwm，被搞死..
 def send_message_to_rpi_right(direction, section_r):
-    pwm = {'direction': direction, 'section_r': section_r}
+    pwm = {"direction": direction, "section_r": section_r}
     print("send message:" ,pwm)
     ser = serial.Serial(
-        port='/dev/ttyAMA1',
+        port="/dev/ttyAMA1",
         baudrate=115200,
         timeout=0.3,
     )
-    ser.write(bytes(str(pwm), 'utf-8'))
+    ser.write(bytes(str(pwm), "utf-8"))
     ser.flush()
     time.sleep(0.1)
     ser.close()
@@ -41,24 +41,24 @@ def send_message_to_rpi_right(direction, section_r):
 def job():
     global data, speed_left, speed_right, speed_top, section_r, section_l
     while connect_status == 1:
-        signal = receive_motor_pwm().decode(errors='ignore')
+        signal = receive_motor_pwm().decode(errors="ignore")
         try:
             signal_dict = ast.literal_eval(signal)
             print(f"Received: {signal_dict}")
-            direction = signal_dict['direction']
-            speed_left = round(signal_dict['left'], 2)
-            speed_right = round(signal_dict['right'], 2)
+            direction = signal_dict["direction"]
+            speed_left = round(signal_dict["left"], 2)
+            speed_right = round(signal_dict["right"], 2)
             speed_top = (speed_left + speed_right) / 2
-            section_r = signal_dict['section_r']
-            section_l = signal_dict['section_l']
+            section_r = signal_dict["section_r"]
+            section_l = signal_dict["section_l"]
 
-            if 'left' in direction:
+            if "left" in direction:
                 data = "l"
-            elif 'right' in direction:
+            elif "right" in direction:
                 data = "r"
-            elif 'photo' in direction:
+            elif "photo" in direction:
                 data = "p"
-            elif 'mid' in direction:
+            elif "mid" in direction:
                 data = "f"
             else:
                 data = "s"
@@ -83,8 +83,8 @@ def main():
     speed_left = 0
     speed_right = 0
     speed_top = 0
-    section_r = 'unspecified'
-    section_l = 'unspecified'
+    section_r = "unspecified"
+    section_l = "unspecified"
     connect_status = 1
     try:
         t = threading.Thread(target=job)
