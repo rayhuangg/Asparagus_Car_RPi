@@ -54,7 +54,6 @@ def main():
     finally:
         print("GPIO cleaning...")
         mycar.parking()
-        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()

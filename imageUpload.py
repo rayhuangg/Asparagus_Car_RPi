@@ -33,21 +33,22 @@ def front(imagepath, name="foo", date="bar"):
 
 def side(section, imagepath, name="foo", date="bar", detection=False):
     """
+    Upload an image to a specified section in the database.
+
     Args:
-        url: fixed, corresponding to database storage.
-        name(optional): String, specify the name for this image, default to 20201212_121212
-        date(optional): datetime object, specify the date and time this image upload, default to now
-        section: integer, specify the section this image belongs to
-                A1~A8 = 1~8
-                B1~B8 = 9~16
-                ...
-                F1~F8 = 41~48
-        image: Bytes, buffer the image for upload
-        detection (bool): determine whether immediate identification is required
+        section (str): Specifying the section this image belongs to.including:
+                       A1~A36
+                       B1~B36
+                       ..
+                       H1~H36
+        imagepath (str): Path to the image file (JPEG or PNG) to be uploaded.
+        name (str, optional): String specifying the name for this image. Default is "20201212_121212".
+        date (str, optional): Datetime string specifying the date and time this image was uploaded. Default is "bar".
+        detection (bool): Boolean flag determining whether immediate identification is required.
 
     Examples:
     >> from imageUpload import side
-    >> front(section=8, imagepath="path/to/the/image.jpg or .png")
+    >> side(section="A1", imagepath="path/to/the/image.jpg or .png")
 
     """
 
@@ -59,10 +60,9 @@ def side(section, imagepath, name="foo", date="bar", detection=False):
     if name != "foo":
         data["name"] = name
     if detection:
-        data["detection"] = detection
+        data["detection"] = True
 
     r = requests.post(url, data=data, files={"image": image})
-
 
     if r.status_code == 200:
         print("Successully uploaded!")
