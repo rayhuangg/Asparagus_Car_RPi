@@ -54,6 +54,7 @@ def job():
 
             # "data" means the status that the car should do
             # (but I think should be change to use the raw receive data)
+            # TODO: remain the raw status data, not the change word.
             if "left" in status:
                 data = "l"
             elif "right" in status:
@@ -64,6 +65,8 @@ def job():
                 data = "p+d" if detection==True else "p"
             elif "mid" in status:
                 data = "f"
+            elif "back" in status:
+                data = "b"
             else:
                 data = "s"
             time.sleep(0.1)

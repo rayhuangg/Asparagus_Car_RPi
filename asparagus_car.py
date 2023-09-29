@@ -46,7 +46,7 @@ class AsparagusCar:
             self.PWM_output_left.start(self.speed)
             self.PWM_output_right.start(self.speed)
 
-        elif self.hostname == "RPiCar1Right" or self.hostname == "RPiCar2Right":
+        elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
             self.status = "s"
 
         print("Car ready")
@@ -78,6 +78,8 @@ class AsparagusCar:
         time.sleep(1.2)
         print("photo saved and upload successed")
 
+    # It not the really slow down, it's stop
+    # TODO: Implement the slow down code
     def __slow_down(self):
         if self.status == "b" or self.status == "f" or self.status == "s":  # bf不確定原因
             while self.speed > 0:
