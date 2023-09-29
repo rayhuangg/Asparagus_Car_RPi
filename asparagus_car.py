@@ -53,10 +53,6 @@ class AsparagusCar:
 
 
     def capture(self, section="unspecified", detection=False):
-        """
-        Actually "unspecified" is not exist on the web section model
-        only "test" exist
-        """
         now = datetime.now().strftime("%Y%m%d_%H_%M_%S")
         if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
             path = "/home/pi/Desktop/photo_record/left/"
@@ -66,13 +62,14 @@ class AsparagusCar:
         if not os.path.isdir(path):
             os.makedirs(path, mode=0o777)
 
-        filename = f"{now}-{section}.jpg"
+        if section == "unspecified":
+            filename = f"{now}.jpg"
+        else:
+            filename = f"{now}-{section}.jpg"
+
         # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
         action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
         os.system(action)
-
-        if section == "unspecified":
-            section = "test"
 
         up.side(section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
         time.sleep(1.2)
