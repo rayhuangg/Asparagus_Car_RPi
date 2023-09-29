@@ -32,6 +32,7 @@ def job():
             print(f"Received: {signal_dict}")
             status = signal_dict["status"]
             section_r = signal_dict["section_r"]
+            detection = signal_dict["detection"]
 
             if "photo" in status:
                 # "p" means take photo
