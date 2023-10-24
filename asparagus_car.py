@@ -55,20 +55,26 @@ class AsparagusCar:
     def capture(self, section="unspecified", detection=False):
         now = datetime.now().strftime("%Y%m%d_%H_%M_%S")
         if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
-            path = "/home/pi/Desktop/photo_record/left/"
+            path = "photo_record/left/"
         elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
-            path = "/home/pi/Desktop/photo_record/right/"
+            path = "photo_record/right/"
 
         if not os.path.isdir(path):
             os.makedirs(path, mode=0o777)
 
         if section == "unspecified":
-            filename = f"{now}.jpg"
+            if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
+                filename = f"{now}_left.jpg"
+            elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
+                filename = f"{now}_right.jpg"
+            else:
+                filename = f"{now}.jpg"
         else:
             filename = f"{now}-{section}.jpg"
 
         # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
-        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
+        # action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
+        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012" # 1920x1080
         os.system(action)
 
         up.side(section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)

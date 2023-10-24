@@ -16,9 +16,9 @@ if __name__ == "__main__":
             if key == 'p':
                 print("Receive key 'p'")
                 if hostname == "RPiCar1Left" or hostname == "RPiCar2Left":
-                    mycar.capture()
+                    mycar.capture(section="unspecified")
                 elif hostname == "RPiCar1Right" or hostname == "RPiCar2Right":
-                    mycar.capture()
+                    mycar.capture(section="unspecified")
 
     except KeyboardInterrupt:
         print("Cleaning the GPIO pin.")
