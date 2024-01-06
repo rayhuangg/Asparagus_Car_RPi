@@ -70,7 +70,10 @@ def job():
             else:
                 data = "s"
             time.sleep(0.1)
-            send_message_to_rpi_right(status, str(section_r), detection=detection)
+
+            # Right rpi only handle the photo action.
+            if data not in ["l", "r", "f"]: # left, right, front
+                send_message_to_rpi_right(status, str(section_r), detection=detection)
 
         # Prevent "unexpected EOF while parsing (<unknown>, line 0)" error
         except SyntaxError:
