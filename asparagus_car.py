@@ -74,7 +74,9 @@ class AsparagusCar:
 
         # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
         # action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
-        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012" # 1920x1080
+
+        # This resolution prevent GPU OOM when predict on the webserver with MaskDINO
+        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012"
         os.system(action)
 
         up.side(section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
