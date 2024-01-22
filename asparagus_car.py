@@ -62,7 +62,8 @@ class AsparagusCar:
         if not os.path.isdir(path):
             os.makedirs(path, mode=0o777)
 
-        if section == "unspecified":
+        if "unspecified" in section:
+            # Prevent too long filename, remove "unspecified"
             if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
                 filename = f"{now}_left.jpg"
             elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
