@@ -31,7 +31,7 @@ def front(imagepath, name="foo", date="bar"):
     image.close()
 
 
-def side(section, imagepath, name="foo", date="bar", detection=False):
+def side(side, section, imagepath, name="foo", date="bar", detection=False):
     """
     Upload an image to a specified section in the database.
 
@@ -45,6 +45,7 @@ def side(section, imagepath, name="foo", date="bar", detection=False):
         name (str, optional): String specifying the name for this image. Default is "20201212_121212".
         date (str, optional): Datetime string specifying the date and time this image was uploaded. Default is "bar".
         detection (bool): Boolean flag determining whether immediate identification is required.
+        side (str): Determine the image belong which side, left or right
 
     Examples:
     >> from imageUpload import side
@@ -61,6 +62,8 @@ def side(section, imagepath, name="foo", date="bar", detection=False):
         data["name"] = name
     if detection:
         data["detection"] = True
+    if side:
+        data["side"] = side
 
     r = requests.post(url, data=data, files={"image": image})
 

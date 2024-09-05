@@ -52,37 +52,45 @@ class AsparagusCar:
         print("Car ready")
 
 
-    def capture(self, section="unspecified", detection=False):
+    def capture(self, section, detection=False):
         now = datetime.now().strftime("%Y%m%d_%H_%M_%S")
+
+        # Determine path based on hostname
         if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
             path = "photo_record/left/"
+            suffix = "left"
+            side = "left"
+            if not section:
+                section = "unspecified_left"
         elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
             path = "photo_record/right/"
-
-        if not os.path.isdir(path):
-            os.makedirs(path, mode=0o777)
-
-        if "unspecified" in section:
-            # Prevent too long filename, remove "unspecified"
-            if self.hostname in ["RPiCar1Left", "RPiCar2Left"]:
-                filename = f"{now}_left.jpg"
-            elif self.hostname in ["RPiCar1Right", "RPiCar2Right"]:
-                filename = f"{now}_right.jpg"
-            else:
-                filename = f"{now}.jpg"
+            suffix = "right"
+            side = "right"
+            if not section:
+                section = "unspecified_right"
         else:
-            filename = f"{now}-{section}.jpg"
+            path = "photo_record/other/"
+            suffix = None
+
+        # Create directory if it does not exist
+        os.makedirs(path, mode=0o777, exist_ok=True)
+
+        # Determine filename based on section and hostname suffix
+        if "unspecified" in section:
+            filename = f"{now}_{suffix}.jpg"
+        else: # A1~H33
+            filename = f"{now}_{side}_{section}.jpg"
+
 
         # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
-        # action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080" # 1920x1080
-
-        # This resolution prevent GPU OOM when predict on the webserver with MaskDINO
-        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012"
+        # action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080"
+        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012" # This resolution prevent GPU OOM when predict on the webserver with MaskDINO
         os.system(action)
 
-        up.side(section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
+        up.side(side=side, section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
         time.sleep(1.2)
         print("photo saved and upload successed")
+
 
     # It not the really slow down, it's stop
     # TODO: Implement the slow down code
