@@ -84,10 +84,10 @@ class AsparagusCar:
 
         # action = f"libcamera-still -n -t 1 -o {path}/{filename}" # 3280x2464
         # action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1920 --height 1080"
-        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012" # This resolution prevent GPU OOM when predict on the webserver with MaskDINO
+        action = f"libcamera-still -n -t 1 -o {path}/{filename} --width 1800 --height 1012 --vflip  --hflip" # This resolution prevent GPU OOM when predict on the webserver with MaskDINO
         os.system(action)
 
-        up.side(side=side, section=section, imagepath=f"{path}/{filename}", name=filename, detection=detection)
+        up.upload_side(side=side, section=section, imagepath=f"{path}/{filename}", filename=filename, detection=detection)
         time.sleep(1.2)
         print("photo saved and upload successed")
 
